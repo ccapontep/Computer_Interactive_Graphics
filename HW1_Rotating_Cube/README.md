@@ -1,4 +1,5 @@
 Interactive Graphics
+
 Homework 1
 Online April 10th, 2018
 Deadline: Tuesday May 1st, 2018 (midnight, Rome time zone)
