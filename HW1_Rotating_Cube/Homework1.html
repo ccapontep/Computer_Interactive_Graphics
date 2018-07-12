@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<!-- // Creating the buttons -->
+<button id = "ButtonX">Rotate X</button>
+<button id = "ButtonY">Rotate Y</button>
+<button id = "ButtonZ">Rotate Z</button>
+<button id = "ButtonT">Toggle Rotation</button>
+<button id = "ButtonC">Direction of Rotation</button>
+<button id = "ButtonPers">Change Perspective</button>
+<button id = "ButtonSh">Change Shading</button>
+
+<!-- // Creating the Sliders -->
+<div>
+Scale 0.05<input id="scaleSlider" type="range"
+ min="0.05" max="2" step="0.01" value="0.5" />
+ 2
+</div>
+
+<div>
+Translate X -2<input id="trans_xSlider" type="range"
+ min="-2" max="2" step="0.01" value="0" />
+ 2
+</div>
+
+<div>
+Translate Y -2<input id="trans_ySlider" type="range"
+ min="-2" max="2" step="0.01" value="0" />
+ 2
+</div>
+
+<div>
+Translate Z -2<input id="trans_zSlider" type="range"
+ min="-2" max="2" step="0.01" value="0" />
+ 2
+</div>
+<div>
+Near 0.01<input id="nearSlider" type="range"
+ min="0.01" max="2.99" step="0.1" value="0.1" />
+ 3
+</div>
+
+<div>
+Far 1<input id="farSlider" type="range"
+ min="1" max="5" step="0.1" value="3" />
+ 5
+</div>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+// General variables for both
+attribute vec4 vPosition;
+attribute vec4 vNormal;
+uniform vec4 lightPosition;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform bool shading;
+
+// Variables for Phong Method
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform float shininess;
+varying vec4 fColor_ph;
+varying vec3 N, L, E;
+
+// Variables for Gouraud Method
+varying vec3 N_g, L_g, E_g;
+
+void main()
+{
+	vec3 pos = -(modelViewMatrix * vPosition).xyz;
+	vec3 light = lightPosition.xyz;		
+	
+	if (shading){
+		//Phong method
+		vec3 L = normalize( light - pos ); // Light source
+		vec3 E = normalize( -pos ); // Viewer
+		vec3 H = normalize( L + E ); // Half-way
+		// Transform vertex normal into eye coordinates
+		vec3 N = normalize( (modelViewMatrix*vNormal).xyz); // Normal
+		// Compute terms in the illumination equation
+		vec4 ambient = ambientProduct;
+		float Kd = max( dot(L, N), 0.0 ); // Kd is diffusion coefficient
+		vec4 diffuse = Kd*diffuseProduct; 
+		float Ks = pow( max(dot(N, H), 0.0), shininess ); // Ks is specular coefficient
+		vec4 specular = Ks * specularProduct;
+		if( dot(L, N) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
+		fColor_ph = ambient + diffuse + specular; // color is comination of all
+		fColor_ph.a = 1.0;
+		
+		gl_Position = projectionMatrix * modelViewMatrix * vPosition; // Position of cube as it rotates
+	}
+	else{
+		// For Gouraud Method
+		L_g = normalize( light - pos ); // Light source
+		E_g = -pos; // Viewer
+		N_g = normalize( (modelViewMatrix*vNormal).xyz); // Normal
+		
+		gl_Position = projectionMatrix * modelViewMatrix * vPosition; // Position of cube as it rotates
+	}
+}
+
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+// General Variables
+precision mediump float;
+uniform bool shading;
+
+// Variables for Phong Method
+varying vec4 fColor_ph;
+
+// Variables for Gouraud Method
+varying vec4 fColor_g;
+uniform vec4 ambientProduct_g, diffuseProduct_g, specularProduct_g;
+uniform float shininess_g;
+varying vec3 N_g, L_g, E_g;
+
+void main()
+{
+	if (shading){gl_FragColor = fColor_ph;} // For Phong Method
+
+	else{
+		// For Gouraud Method
+		vec4 fColor_g;
+		vec3 H_g = normalize( L_g + E_g ); // Half-way
+		vec4 ambient_g = ambientProduct_g;
+		float Kd_g = max( dot(L_g, N_g), 0.0 ); // Kd is the diffuse coefficient
+		vec4 diffuse_g = Kd_g * diffuseProduct_g;
+		float Ks_g = pow( max(dot(N_g, H_g), 0.0), shininess_g ); // Ks is the specular coefficient
+		vec4 specular_g = Ks_g * specularProduct_g;
+		if( dot(L_g, N_g) < 0.0 ) specular_g = vec4(0.0, 0.0, 0.0, 1.0);
+		fColor_g = ambient_g + diffuse_g + specular_g; // color is combination of all variables
+		fColor_g.a = 1.0;
+		gl_FragColor = fColor_g;
+	}
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="Homework1.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="1024" height="1024">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>
