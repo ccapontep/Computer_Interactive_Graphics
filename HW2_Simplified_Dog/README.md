@@ -1,6 +1,3 @@
-# Computer_Interactive_Graphics
-Homeworks and projects for the class of Interactive Graphics
-
 Interactive Graphics
 Homework 2
 Online May 10th, 2018
