@@ -1,8 +1,9 @@
 Interactive Graphics
 
 Homework 1
-Online April 10th, 2018
+
 Deadline: Tuesday May 1st, 2018 (midnight, Rome time zone)
+
 Tasks to do:
 The homework must be completed alone. Each student should do its own homework. Download the file Homework1.zip from the course homepage in Piazza https://piazza.com/uniroma1.it/spring2018/1044398/home
 After unzipping you will find this file, and 2 directories, one (Common) contains the required libraries, and one contains the files to modify (Homework1.html and Homework1.js). You need to modify the files so to obtain the following effects.
